@@ -1,6 +1,7 @@
 [package]
-name = "amae"
+name = "MountAndExec"
 version = "0.1.0"
 authors = ["Boris Popov <popov@whitekefir.ru>"]
 
 [dependencies]
+libc = "0.2.17"
