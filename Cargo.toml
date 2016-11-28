@@ -1,0 +1,6 @@
+[package]
+name = "amae"
+version = "0.1.0"
+authors = ["Boris Popov <popov@whitekefir.ru>"]
+
+[dependencies]
