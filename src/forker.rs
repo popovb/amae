@@ -6,6 +6,37 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-pub fn hello() {
+extern crate libc;
 
+use self::libc::fork;
+use worker;
+
+pub struct Forker {
+}
+
+impl Forker {
+    pub fn new() -> Forker {
+        Forker{}
+    }
+
+    pub fn spawn(&self) {
+        let pid: i32;
+        unsafe {
+            pid = fork();
+        }
+
+        if pid < 0 {
+            panic!("Can't fork!");
+        }
+
+        if pid != 0 {
+            return;
+        }
+
+        self.main();
+    }
+
+    fn main(&self) {
+        worker::main();
+    }
 }
