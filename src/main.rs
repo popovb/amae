@@ -8,37 +8,11 @@
 
 #![allow(non_snake_case)]
 
-extern crate libc;
-
 mod forker;
-mod logger;
-
-use forker::hello;
-//use forker::hello;
-//use libc;
-//use libc::fork;
-//use libc::exit;
+mod worker;
 
 fn main() {
-    println!("Hello, world!");
-    hello();
 
-    let x: i32;
-    unsafe {
-        x = libc::fork();
-    }
-
-    if x == 0 {
-        unsafe {
-            libc::sleep(10);
-            libc::exit(2);
-        }
-    }
-    /*
-    unsafe {
-        sleep(5);
-    }
-     */
-    //pub unsafe extern fn fork() -> pid_t
-    println!("Exit!");
+    let forker = forker::Forker::new();
+    forker.spawn();
 }
