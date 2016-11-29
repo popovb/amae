@@ -5,3 +5,4 @@ authors = ["Boris Popov <popov@whitekefir.ru>"]
 
 [dependencies]
 libc = "0.2.17"
+syslog = "3.2.0"
