@@ -8,22 +8,25 @@
 
 use logger::Logger;
 use program::{NAME, VERSION};
+use env::Env;
+use mounter::Mounter;
+use executor::Executor;
 
 pub fn main() {
     let logger = Logger::new(NAME);
     let name_ver = NAME.to_string() + "-" + VERSION;
     let start = name_ver.clone() + " starting!";
     logger.info(&start);
-    logger.error("test!");
-    //
-    //
-    //TODO work
-    //
+
+    let env = Env::new();
+    env.load(&logger);
+
+    let mnt = Mounter::new();
+    mnt.mount(&logger, &env);
+
+    let ex = Executor::new();
+    ex.start(&logger, &env);
+
     let end = name_ver.clone() + " exiting!";
     logger.info(&end);
 }
-//use libc;
-//use libc::fork;
-//use libc::exit;
-//extern crate libc;
-//use self::libc::sleep;
