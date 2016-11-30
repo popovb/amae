@@ -6,62 +6,24 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-extern crate libc;
-use self::libc::sleep;
+use logger::Logger;
+use program::{NAME, VERSION};
 
 pub fn main() {
+    let logger = Logger::new(NAME);
+    let name_ver = NAME.to_string() + "-" + VERSION;
+    let start = name_ver.clone() + " starting!";
+    logger.info(&start);
+    logger.error("test!");
+    //
     //
     //TODO work
     //
-    unsafe {
-        sleep(15);
-    }
+    let end = name_ver.clone() + " exiting!";
+    logger.info(&end);
 }
-//mod program;
-//use program::{NAME, VERSION};
-
-//mod logger;
-//use logger::{Logger};
-
-//use forker::hello;
-//use forker::hello;
 //use libc;
 //use libc::fork;
 //use libc::exit;
-
-
-    //let logger = logger::Logger{name: NAME, version: VERSION};
-    //logger.start();
-    //let logger = Logger::new(NAME, VERSION);
-    //let logger = Logger::new(NAME, VERSION);
-
-
-    
-    //println!("{}", NAME);
-    //let pi = program::Info{name: NAME, version: VERSION};
-    //pi.init();
-    //println!("{}", pi.name());
-    //println!("{}", pi.version());
-    /*
-    println!("Hello, world!");
-    hello();
-
-    let x: i32;
-    unsafe {
-        x = libc::fork();
-    }
-
-    if x == 0 {
-        unsafe {
-            libc::sleep(10);
-            libc::exit(2);
-        }
-    }
-    //
-    unsafe {
-        sleep(5);
-    }
-     
-    //pub unsafe extern fn fork() -> pid_t
-    println!("Exit!");
-    */
+//extern crate libc;
+//use self::libc::sleep;

@@ -10,6 +10,8 @@
 
 mod forker;
 mod worker;
+mod logger;
+mod program;
 
 fn main() {
 

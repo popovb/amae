@@ -10,28 +10,3 @@
 pub static NAME:    &'static str = "MountAndExec";
 pub static VERSION: &'static str = "0.1.0";
 //////////////////////////////////////////////////////////////////
-/*
-pub struct Info {
-
-    pub name:    &'static str,
-    version: &'static str
-}
-
-impl Info {
-    pub fn init(&mut self) {
-        self.name = &NAME;
-        //self.version = VERSION.to_string();
-        
-        //self.name = "MountAndExec";
-        //
-        //TODO
-        //
-        //return;
-    }
-*/
-    /*
-    fn area(&self) -> f64 {
-        std::f64::consts::PI * (self.radius * self.radius)
-    }
-    */
-//}
