@@ -32,6 +32,14 @@ impl Env {
         self.load_script(l);
     }
 
+    pub fn getDir(&self) -> &str {
+        return &self.dir;
+    }
+
+    pub fn getScript(&self) -> &str {
+        return &self.script;
+    }
+
     fn load_device(&mut self, l: &logger::Logger) {
         self.device = self.load_("AMAE_DEVICE", l);
     }
@@ -57,7 +65,7 @@ impl Env {
                 Err(e) => {
                     let mut ss = self.ef(name);
                     ss += " ";
-                    ss += &(format!("{:?}", e));
+                    ss += &(format!("{}", e));
                     self.error__(ss, l);
                     return "".to_string();
                 }
