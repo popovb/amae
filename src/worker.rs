@@ -18,7 +18,7 @@ pub fn main() {
     let start = name_ver.clone() + " starting!";
     logger.info(&start);
 
-    let env = Env::new();
+    let mut env = Env::new();
     env.load(&logger);
 
     let mnt = Mounter::new();
