@@ -8,21 +8,54 @@
 
 use logger;
 use env;
+use std::process::Command;
 
 pub struct Executor {
 }
 
 impl Executor {
     pub fn new() -> Executor {
-        //
-        //TODO
-        //
         Executor{}
     }
 
     pub fn start(&self, l: &logger::Logger, e: &env::Env) {
-        //
-        //TODO
-        //
+        let es = e.getScript().to_string() + " " + e.getDir();
+        let res = Command::new(e.getScript())
+            .arg(e.getDir()).status();
+        match res {
+            Ok(o) => {
+                if o.success() {
+                    let mut ss = "Executing ".to_string();
+                    ss += &es;
+                    ss += " OK!";
+                    l.info(&ss);
+                } else {
+                    let os = o.code();
+                    let mut ec = es;
+                    match os {
+                        None => {
+                            ec += "Terminated by a signal!";
+                        },
+                        Some(t) => {
+                            ec += " Exit code: ";
+                            ec += &(format!("{}", t));
+                        }
+                    }
+                    l.info(&ec);
+                }
+            },
+            Err(e) => {
+                let mut ss = "Error of executing ".to_string();
+                ss += &es;
+                ss += " ";
+                ss += &(format!("{}", e));
+                self.error__(ss, l);
+            }
+        }
+    }
+
+    fn error__(&self, s: String, l: &logger::Logger) {
+        l.error(&s);
+        panic!(s);
     }
 }
