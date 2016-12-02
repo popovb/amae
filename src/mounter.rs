@@ -13,6 +13,7 @@ use env;
 use std::process::exit;
 use self::regex::Regex;
 
+//////////////////////////////////////////////////////////////////
 pub struct Mounter {
     label: Option<String>
 }
@@ -26,9 +27,8 @@ impl Mounter {
     pub fn mount(&self, l: &logger::Logger, e: &env::Env) {
         //self.load_label();
         if !self.verify_label(e.getLabel()) {
-            //
-            //TODO to log
-            //
+            let i = format!("Label does not match {}.", e.getLabel());
+            l.info(&i);
             exit(0);
         }
 
@@ -39,7 +39,7 @@ impl Mounter {
     fn verify_label(&self, templ: &str) -> bool {
         let lbl :String;
         match self.label {
-            None    => { return false; },
+            None        => { return false; },
             Some(ref l) => { lbl = l.to_string(); }
         }
 
@@ -50,7 +50,9 @@ impl Mounter {
         }
     }
 }
+//////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////
 #[test]
 fn test_verify_label_01() {
     let i = Mounter{label: Some("BNC-124".to_string())};
@@ -98,3 +100,4 @@ fn test_verify_label_09() {
     let i = Mounter{label: Some("01234_ NC 782883 ".to_string())};
     assert_eq!(false, i.verify_label(".*ANC.*"));
 }
+//////////////////////////////////////////////////////////////////
