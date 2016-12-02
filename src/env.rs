@@ -16,13 +16,15 @@ use std::ffi::CString;
 pub struct Env {
     device: String,
     dir:    String,
-    script: String
+    script: String,
+    label: String
 }
 
 impl Env {
     pub fn new() -> Env {
         return Env{device: "".to_string(),
                    dir:    "".to_string(),
+                   label:  "".to_string(),
                    script: "".to_string()}
     }
 
@@ -41,6 +43,10 @@ impl Env {
         return &self.script;
     }
 
+    pub fn getLabel(&self) -> &str {
+        return &self.label;
+    }
+
     fn load_device(&mut self, l: &logger::Logger) {
         self.device = self.load_("AMAE_DEVICE", l);
     }
@@ -54,7 +60,7 @@ impl Env {
     }
 
     fn load_label(&mut self, l: &logger::Logger) {
-        self.script = self.load_("AMAE_LABEL", l);
+        self.label = self.load_("AMAE_LABEL", l);
     }
 
     fn load_(&self, name: &str, l: &logger::Logger) -> String {
