@@ -30,6 +30,7 @@ impl Env {
         self.load_device(l);
         self.load_dir(l);
         self.load_script(l);
+        self.load_label(l);
     }
 
     pub fn getDir(&self) -> &str {
@@ -50,6 +51,10 @@ impl Env {
 
     fn load_script(&mut self, l: &logger::Logger) {
         self.script = self.load_("AMAE_SCRIPT", l);
+    }
+
+    fn load_label(&mut self, l: &logger::Logger) {
+        self.script = self.load_("AMAE_LABEL", l);
     }
 
     fn load_(&self, name: &str, l: &logger::Logger) -> String {
