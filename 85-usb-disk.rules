@@ -1,1 +1,1 @@
-ACTION=="add", KERNEL=="sd?1", SUBSYSTEM=="block", ENV{AMAE_LABEL}="*ANC*", ENV{AMAE_DEVICE}="/dev/$name", ENV{AMAE_MOUNT_DIR}="/mnt/temp", RUN{program}="/usr/local/bin/MountAndExec"
+ACTION=="add", KERNEL=="sd?1", SUBSYSTEM=="block", ENV{AMAE_LABEL}=".*ANC.*", ENV{AMAE_DEVICE}="/dev/$name", ENV{AMAE_MOUNT_DIR}="/mnt/temp", RUN{program}="/usr/local/bin/MountAndExec"
