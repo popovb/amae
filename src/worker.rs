@@ -21,7 +21,7 @@ pub fn main() {
     let mut env = Env::new();
     env.load(&logger);
 
-    let mnt = Mounter::new();
+    let mut mnt = Mounter::new();
     mnt.mount(&logger, &env);
 
     let ex = Executor::new();
