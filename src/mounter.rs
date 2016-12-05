@@ -12,10 +12,11 @@ use logger;
 use env;
 use std::process::exit;
 use self::regex::Regex;
+use blkid;
 
 //////////////////////////////////////////////////////////////////
 pub struct Mounter {
-    label: Option<String>
+    label:  Option<String>
 }
 
 impl Mounter {
@@ -24,14 +25,16 @@ impl Mounter {
         Mounter{label: None}
     }
 
-    pub fn mount(&self, l: &logger::Logger, e: &env::Env) {
-        //self.load_label();
+    pub fn mount(&mut self, l: &logger::Logger, e: &env::Env) {
+        self.load_label(e.getDevice(), l);
         if !self.verify_label(e.getLabel()) {
             let i = format!("Label does not match {}.", e.getLabel());
             l.info(&i);
             exit(0);
         }
-
+        //
+        //TODO
+        //
         //self.load_fs_type();
         //self.process();
     }
@@ -48,6 +51,13 @@ impl Mounter {
             Ok(re) => re.is_match(&lbl),
             _      => false
         }
+    }
+
+    fn load_label(&mut self, dev: &str, l: &logger::Logger) {
+        let prober_r = blkid::Prober::new(dev);
+        //
+        //TODO
+        //
     }
 }
 //////////////////////////////////////////////////////////////////
