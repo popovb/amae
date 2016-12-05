@@ -47,6 +47,10 @@ impl Env {
         return &self.label;
     }
 
+    pub fn getDevice(&self) -> &str {
+        return &self.device;
+    }
+
     fn load_device(&mut self, l: &logger::Logger) {
         self.device = self.load_("AMAE_DEVICE", l);
     }
