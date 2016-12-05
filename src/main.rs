@@ -15,6 +15,7 @@ mod program;
 mod env;
 mod mounter;
 mod executor;
+mod blkid;
 
 fn main() {
 
