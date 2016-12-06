@@ -142,5 +142,11 @@ fn test_blkid_01() {
         Ok(r)  => println!("{}", r),
         Err(r) => println!("{}", r)
     }
+
+    let k = p.get("ARC");
+    match k {
+        Ok(r)  => println!("{}", r),
+        Err(r) => println!("{}", r)
+    }
 }
 //////////////////////////////////////////////////////////////////
