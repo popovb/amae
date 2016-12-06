@@ -17,7 +17,7 @@ pub struct Env {
     device: String,
     dir:    String,
     script: String,
-    label: String
+    label:  String
 }
 
 impl Env {
