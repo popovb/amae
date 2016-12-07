@@ -8,7 +8,6 @@
 
 extern crate libc;
 
-use self::libc::c_char;
 use self::libc::c_void;
 use self::libc::c_ulong;
 use self::libc::c_int;
@@ -18,9 +17,9 @@ use strerror::getStrError;
 
 //////////////////////////////////////////////////////////////////
 pub struct MountInfo<'a> {
-    source:     &'a str,
-    target:     &'a str,
-    filesystem: &'a str
+    pub source:     &'a str,
+    pub target:     &'a str,
+    pub filesystem: &'a str
 }
 
 pub fn mount(mi: &MountInfo) -> Result<(), String> {
@@ -43,8 +42,8 @@ pub fn mount(mi: &MountInfo) -> Result<(), String> {
     return get_result(result, "mount");
 }
 
-pub fn umount(mi: &MountInfo) -> Result<(), String> {
-    let c_target = CString::new(mi.target).unwrap();
+pub fn umount(target: &str) -> Result<(), String> {
+    let c_target = CString::new(target).unwrap();
     let target_raw = c_target.into_raw();
     let mut result: c_int = 0;
     unsafe {
@@ -80,7 +79,7 @@ fn test_mount_01() {
         _      => println!("\nMOUNT OK")
     }
 
-    let res2 = umount(&mi);
+    let res2 = umount(mi.target);
     match res2 {
         Err(e) => println!("\nUMOUNT ERROR: {}", e),
         _      => println!("\nUMOUNT OK")
