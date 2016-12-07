@@ -43,22 +43,22 @@ pub fn mount(mi: &MountInfo) -> Result<(), String> {
     match result {
         0  => Ok(()),
         -1 => Err(getStrError()),
-        _  => Err("Unexpected error in mount::mount!".to_string()),
+        _  => Err("Unexpected error in mount::mount!".to_string())
     }
 }
-/*
-pub unsafe extern fn mount(src: *const c_char,
-                           target: *const c_char,
-                           fstype: *const c_char,
-                           flags: c_ulong,
-                           data: *const c_void)
-                           -> c_int
-*/
+
 pub fn umount(mi: &MountInfo) -> Result<(), String> {
-    //
-    //TODO
-    //
-    Ok(())
+    let c_target = CString::new(mi.target).unwrap();
+    let target_raw = c_target.into_raw();
+    let mut result: c_int = 0;
+    unsafe {
+        result = libc::umount(target_raw);
+    }
+    match result {
+        0  => Ok(()),
+        -1 => Err(getStrError()),
+        _  => Err("Unexpected error in mount::umount!".to_string())
+    }
 }
 //////////////////////////////////////////////////////////////////
 
@@ -68,17 +68,17 @@ fn test_mount_01() {
     let mi = MountInfo{source: "/dev/sdb1",
                        target: "/mnt/temp",
                        filesystem: "ext4"};
+    println!("\n *** mount *** \n");
     let res = mount(&mi);
-    //assert_eq!(false, i.verify_label(".*ANC.*"));
-}
+    match res {
+        Err(e) => println!("\nMOUNT ERROR: {}", e),
+        _      => println!("\nMOUNT OK")
+    }
 
-#[test]
-#[ignore]
-fn test_mount_02() {
-    let mi = MountInfo{source: "/dev/sdb1",
-                       target: "/mnt/temp",
-                       filesystem: "ext4"};
-    let res = umount(&mi);
-    //assert_eq!(false, i.verify_label(".*ANC.*"));
+    let res2 = umount(&mi);
+    match res2 {
+        Err(e) => println!("\nUMOUNT ERROR: {}", e),
+        _      => println!("\nUMOUNT OK")
+    }
 }
 //////////////////////////////////////////////////////////////////
