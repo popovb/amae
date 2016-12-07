@@ -16,6 +16,8 @@ mod env;
 mod mounter;
 mod executor;
 mod blkid;
+mod mount;
+mod strerror;
 
 fn main() {
 
