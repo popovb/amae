@@ -13,19 +13,22 @@ use env;
 use std::process::exit;
 use self::regex::Regex;
 use blkid;
+use mount;
+use mount::MountInfo;
 
 //////////////////////////////////////////////////////////////////
 pub struct Mounter {
     part_label: String,
-    part_type:  String
+    part_type:  String,
+    target:     String
 }
 
 impl Mounter {
-
     pub fn new() -> Mounter {
         Mounter{
             part_label: "".to_string(),
-            part_type: "".to_string()
+            part_type:  "".to_string(),
+            target:     "".to_string()
         }
     }
 
@@ -36,10 +39,25 @@ impl Mounter {
             l.info(&i);
             exit(0);
         }
-        //
-        //TODO
-        //
-        //self.process();
+        self.process(l, e);
+    }
+
+    fn process(&mut self, l: &logger::Logger, e: &env::Env) {
+        let source = e.getDevice().to_string();
+        self.target = e.getDir().to_string();
+        let mi = MountInfo{source: &source,
+                           target: &self.target,
+                           filesystem: &self.part_type};
+        let res = mount::mount(&mi);
+        match res {
+            Err(e) => {
+                l.info(&e);
+                exit(0);
+            },
+            _ => {
+                return;
+            }
+        }
     }
 
     fn verify_label(&self, templ: &str) -> bool {
@@ -95,12 +113,21 @@ impl Mounter {
         }
     }
 }
+
+impl Drop for Mounter {
+    fn drop(&mut self) {
+        if self.target.len() != 0 {
+            mount::umount(&self.target);
+        }
+    }
+}
 //////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////
 #[test]
 fn test_verify_label_01() {
     let i = Mounter{part_label: "BNC-124".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(false, i.verify_label(".*ANC.*"));
 }
@@ -108,6 +135,7 @@ fn test_verify_label_01() {
 #[test]
 fn test_verify_label_02() {
     let i = Mounter{part_label: "XANC-124".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -115,6 +143,7 @@ fn test_verify_label_02() {
 #[test]
 fn test_verify_label_04() {
     let i = Mounter{part_label: "ANC".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -122,6 +151,7 @@ fn test_verify_label_04() {
 #[test]
 fn test_verify_label_05() {
     let i = Mounter{part_label: "01234_ ANC".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -129,6 +159,7 @@ fn test_verify_label_05() {
 #[test]
 fn test_verify_label_06() {
     let i = Mounter{part_label: "01234_ ANC 782883 ".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -136,6 +167,7 @@ fn test_verify_label_06() {
 #[test]
 fn test_verify_label_07() {
     let i = Mounter{part_label: " ANC 782883 ".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -143,6 +175,7 @@ fn test_verify_label_07() {
 #[test]
 fn test_verify_label_08() {
     let i = Mounter{part_label: "ANC---!782883 ".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(true, i.verify_label(".*ANC.*"));
 }
@@ -150,6 +183,7 @@ fn test_verify_label_08() {
 #[test]
 fn test_verify_label_09() {
     let i = Mounter{part_label: "01234_ NC 782883 ".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(false, i.verify_label(".*ANC.*"));
 }
@@ -157,6 +191,7 @@ fn test_verify_label_09() {
 #[test]
 fn test_verify_label_10() {
     let i = Mounter{part_label: "".to_string(),
+                    target: "/mnt/temp".to_string(),
                     part_type: "".to_string()};
     assert_eq!(false, i.verify_label(".*ANC.*"));
 }
