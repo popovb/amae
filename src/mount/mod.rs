@@ -40,11 +40,7 @@ pub fn mount(mi: &MountInfo) -> Result<(), String> {
                              flags,
                              data);
     }
-    match result {
-        0  => Ok(()),
-        -1 => Err(getStrError()),
-        _  => Err("Unexpected error in mount::mount!".to_string())
-    }
+    return get_result(result, "mount");
 }
 
 pub fn umount(mi: &MountInfo) -> Result<(), String> {
@@ -54,10 +50,19 @@ pub fn umount(mi: &MountInfo) -> Result<(), String> {
     unsafe {
         result = libc::umount(target_raw);
     }
+    return get_result(result, "umount");
+}
+
+fn get_result(result: c_int, s: &str) -> Result<(), String> {
     match result {
         0  => Ok(()),
         -1 => Err(getStrError()),
-        _  => Err("Unexpected error in mount::umount!".to_string())
+        _  => {
+            let mut mess = "Unexpected error in mount::".to_string();
+            mess += s;
+            mess += "!";
+            Err(mess)
+        }
     }
 }
 //////////////////////////////////////////////////////////////////
