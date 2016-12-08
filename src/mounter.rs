@@ -16,7 +16,8 @@ use mount;
 pub struct Mounter {
     part_label: String,
     part_type:  String,
-    target:     String
+    target:     String,
+    umount:     bool
 }
 
 impl Mounter {
@@ -24,13 +25,14 @@ impl Mounter {
         Mounter{
             part_label: "".to_string(),
             part_type:  "".to_string(),
-            target:     "".to_string()
+            target:     "".to_string(),
+            umount:     false
         }
     }
 
     pub fn mount(&mut self, l: &logger::Logger, e: &env::Env) {
         self.load_part_info(e.getDevice(), l);
-        let result = self.verify_label(e.getLabel(), l);
+        let result = self.verify_label(e.getLabel());
         if ! result {
             let i = format!("Label does not match {}.", e.getLabel());
             l.info(&i);
@@ -42,6 +44,8 @@ impl Mounter {
     fn process(&mut self, l: &logger::Logger, e: &env::Env) {
         let source = e.getDevice().to_string();
         self.target = e.getDir().to_string();
+        self.umount = e.getUmount();
+        l.info("Trying mount part...");
         let res = mount::mount(source.as_str(),
                                self.target.as_str(),
                                self.part_type.as_str());
@@ -51,7 +55,7 @@ impl Mounter {
                 exit(0);
             },
             _ => {
-                let i = format!("Mount {} to {} OK!",
+                let i = format!("... {} to {} OK!",
                                 source.as_str(),
                                 self.target.as_str());
                 l.info(i.as_str());
@@ -60,7 +64,7 @@ impl Mounter {
         }
     }
 
-    fn verify_label(&self, templ: &str, l: &logger::Logger) -> bool {
+    fn verify_label(&self, templ: &str) -> bool {
         if self.part_label.len() == 0 {
             return false;
         }
@@ -84,6 +88,9 @@ impl Mounter {
         match lr {
             Ok(o) => {
                 self.part_label = o;
+                let s = format!("Label of part: {}",
+                                self.part_label);
+                l.info(s.as_str());
             },
             Err(e) => {
                 l.error(&e);
@@ -97,6 +104,9 @@ impl Mounter {
         match lr {
             Ok(o) => {
                 self.part_type = o;
+                let s = format!("Type of part: {}",
+                                self.part_type);
+                l.info(s.as_str());
             },
             Err(e) => {
                 l.error(&e);
@@ -108,10 +118,9 @@ impl Mounter {
 impl Drop for Mounter {
     fn drop(&mut self) {
         if self.target.len() != 0 {
-            //
-            //TODO
-            //
-            //mount::umount(&self.target);
+            if self.umount {
+                mount::umount(&self.target);
+            }
         }
     }
 }
