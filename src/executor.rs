@@ -20,12 +20,13 @@ impl Executor {
 
     pub fn start(&self, l: &logger::Logger, e: &env::Env) {
         let es = e.getScript().to_string() + " " + e.getDir();
+        l.info("Trying execute command...");
         let res = Command::new(e.getScript())
             .arg(e.getDir()).status();
         match res {
             Ok(o) => {
                 if o.success() {
-                    let mut ss = "Executing ".to_string();
+                    let mut ss = "... ".to_string();
                     ss += &es;
                     ss += " OK!";
                     l.info(&ss);
