@@ -6,18 +6,16 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 //
 
-extern crate libc;
-
 use logger;
-use self::libc::getenv;
+use std::env;
 
-use std::ffi::CString;
-
+//////////////////////////////////////////////////////////////////
 pub struct Env {
     device: String,
     dir:    String,
     script: String,
-    label:  String
+    label:  String,
+    umount: bool
 }
 
 impl Env {
@@ -25,7 +23,8 @@ impl Env {
         return Env{device: "".to_string(),
                    dir:    "".to_string(),
                    label:  "".to_string(),
-                   script: "".to_string()}
+                   script: "".to_string(),
+                   umount: false}
     }
 
     pub fn load(&mut self, l: &logger::Logger) {
@@ -33,6 +32,7 @@ impl Env {
         self.load_dir(l);
         self.load_script(l);
         self.load_label(l);
+        self.load_umount(l);
     }
 
     pub fn getDir(&self) -> &str {
@@ -51,62 +51,64 @@ impl Env {
         return &self.device;
     }
 
+    pub fn getUmount(&self) -> bool {
+        return self.umount;
+    }
+
     fn load_device(&mut self, l: &logger::Logger) {
-        self.device = self.load_("AMAE_DEVICE", l);
+        let k = "AMAE_DEVICE";
+        self.device = self.load_(k);
+        self.print(&k, &self.device, l);
     }
 
     fn load_dir(&mut self, l: &logger::Logger) {
-        self.dir = self.load_("AMAE_MOUNT_DIR", l);
+        let k = "AMAE_MOUNT_DIR";
+        self.dir = self.load_(k);
+        self.print(&k, &self.dir, l);
     }
 
     fn load_script(&mut self, l: &logger::Logger) {
-        self.script = self.load_("AMAE_SCRIPT", l);
+        let k = "AMAE_SCRIPT";
+        self.script = self.load_(k);
+        self.print(&k, &self.script, l);
     }
 
     fn load_label(&mut self, l: &logger::Logger) {
-        self.label = self.load_("AMAE_LABEL", l);
+        let k = "AMAE_LABEL";
+        self.label = self.load_(k);
+        self.print(&k, &self.label, l);
     }
 
-    fn load_(&self, name: &str, l: &logger::Logger) -> String {
-        let cname = CString::new(name).unwrap();
-        let cname_ptr = cname.as_ptr();
-        unsafe {
-            let out = getenv(cname_ptr);
-            if out.is_null() { self.error_(name, l); }
-            let cstring = CString::from_raw(out);
-            let res = cstring.into_string();
-            match res {
-                Ok(v)  => return v,
-                Err(e) => {
-                    let mut ss = self.ef(name);
-                    ss += " ";
-                    ss += &(format!("{}", e));
-                    self.error__(ss, l);
-                    return "".to_string();
-                }
-            }
+    fn load_umount(&mut self, l: &logger::Logger) {
+        let k = "AMAE_UMOUNT";
+        let x = self.load_(k);
+        self.print(&k, &x, l);
+        if x == "YES".to_string() {
+            self.umount = true;
         }
     }
 
-    fn error_(&self, name: &str, l: &logger::Logger) {
-        self.error__(self.ef(name), l);
+    fn print(&self, key: &str, val: &str,
+             l: &logger::Logger) {
+        let s = format!("env: {} -> {}", key, val);
+        l.info(s.as_str());
     }
 
-    fn ef(&self, name: &str) -> String {
-        let em = "Can't get env: ".to_string() +
-            name + "!";
-        return em;
-    }
-
-    fn error__(&self, s: String, l: &logger::Logger) {
-        l.error(s.as_str());
-        panic!(s);
+    fn load_(&self, name: &str) -> String {
+        if name.len() == 0 {
+            return "".to_string();
+        }
+        match env::var_os(name) {
+            Some(val) => {
+                if val.is_empty() {
+                    return "".to_string();
+                }
+                return val.into_string().unwrap();
+            },
+            None      => {
+                return "".to_string();
+            }
+        }
     }
 }
-/*
-#[test]
-fn hello() {
-    let x = Err("test");
-    assert_eq!("test", x.unwrap());
-}
- */
+//////////////////////////////////////////////////////////////////
