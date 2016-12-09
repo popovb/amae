@@ -18,7 +18,7 @@ use std::ffi::CString;
 //////////////////////////////////////////////////////////////////
 pub struct Prober<'a> {
     file:       &'a str,
-    raw_prober: Cell<*const i32>
+    raw_prober: Cell<*const usize>
 }
 
 impl<'a> Prober<'a> {
@@ -108,13 +108,13 @@ impl<'a> Drop for Prober<'a> {
 //////////////////////////////////////////////////////////////////
 #[link(name = "blkid")]
 extern {
-    fn blkid_new_probe_from_filename(file: *const c_char) -> *const i32;
-    fn blkid_do_probe(prober: *const i32) -> c_int;
-    fn blkid_probe_lookup_value(prober: *const i32,
+    fn blkid_new_probe_from_filename(file: *const c_char) -> *const usize;
+    fn blkid_do_probe(prober: *const usize) -> c_int;
+    fn blkid_probe_lookup_value(prober: *const usize,
                                 key: *const c_char,
                                 data: *mut *mut c_char,
                                 size: *const size_t) -> c_int;
-    fn blkid_free_probe(prober: *const i32);
+    fn blkid_free_probe(prober: *const usize);
 }
 //////////////////////////////////////////////////////////////////
 
